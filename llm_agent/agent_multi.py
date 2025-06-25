@@ -3,7 +3,6 @@ import json
 from typing import Tuple, List, Any, Optional
 from langchain_openai import AzureChatOpenAI
 from langchain.agents import create_openai_tools_agent, AgentExecutor
-from langchain.memory import ConversationBufferMemory
 import tiktoken
 from dotenv import load_dotenv
 
@@ -19,8 +18,7 @@ AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 
-# ─────────── MEMORY ───────────
-memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+# ─────────── NO MEMORY - STATELESS ───────────
 
 # ─────────── LLM ───────────
 llm = AzureChatOpenAI(
@@ -42,21 +40,23 @@ agent = create_openai_tools_agent(
 executor = AgentExecutor(
     agent=agent,
     tools=[generate_pinescript],
-    memory=memory,
-    verbose=True,
+    verbose=False,
     max_iterations=3,
     return_intermediate_steps=True,
 )
 
 # ─────────── MAIN FUNCTION ───────────
 def run_pinescript_agent(
-    user_input: str, 
-    use_multi: bool = True
+    user_input: str,
+    previous_summary: str = "No previous conversation."
 ) -> Tuple[str, int, float, List[Any], List[Any]]:
     """Trading strategy chat with PineScript generation"""
     
-    # Run the agent
-    result = executor.invoke({"input": user_input})
+    # Run the agent with both input and previous_summary
+    result = executor.invoke({
+        "input": user_input,
+        "previous_summary": previous_summary
+    })
     
     # Get the output - should already be JSON
     output = result["output"]
@@ -92,12 +92,8 @@ def run_pinescript_agent(
         }
         json_str = json.dumps(response)
     
-    # Return response
-    return json_str, 0, 0.0, memory.buffer, []
-
-def clear_conversation_memory():
-    """Clear memory"""
-    memory.clear()
+    # Return response - no memory buffer
+    return json_str, 0, 0.0, [], []
 
 # Backwards compatibility - old function name (DEPRECATED)
 def run_multi_collection_retrieval(user_input: str, use_multi: bool = True, **kwargs):
