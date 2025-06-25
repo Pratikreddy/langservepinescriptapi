@@ -1,0 +1,57 @@
+PINESCRIPT V5 KNOWLEDGE BASE
+
+## Core Concepts
+- PineScript is TradingView's programming language for creating trading indicators and strategies
+- Version 5 is the latest version with improved performance and features
+- Scripts run on each bar of the chart, executing from left to right
+
+## Basic Structure
+//@version=5
+indicator("My Script", overlay=true)  // For indicators
+strategy("My Strategy", overlay=true) // For strategies
+
+## Common Functions and Variables
+- close, open, high, low, volume - OHLCV data
+- ta.sma(), ta.ema() - Moving averages
+- ta.rsi() - Relative Strength Index
+- ta.macd() - MACD indicator
+- ta.crossover(), ta.crossunder() - Crossover detection
+- strategy.entry(), strategy.close() - Strategy orders
+
+## Best Practices
+1. Always declare variable types explicitly when needed
+2. Use := for variable reassignment
+3. Prefer built-in functions over custom calculations
+4. Handle na values properly with na() or nz()
+5. Use proper indentation for readability
+
+## Common Patterns
+
+### Moving Average Crossover
+fastMA = ta.sma(close, 20)
+slowMA = ta.sma(close, 50)
+longCondition = ta.crossover(fastMA, slowMA)
+shortCondition = ta.crossunder(fastMA, slowMA)
+
+### RSI Overbought/Oversold
+rsi = ta.rsi(close, 14)
+overbought = rsi > 70
+oversold = rsi < 30
+
+### Bollinger Bands
+[middle, upper, lower] = ta.bb(close, 20, 2)
+
+### Stop Loss and Take Profit
+strategy.exit("Exit", "Long", stop=strategy.position_avg_price * 0.98, limit=strategy.position_avg_price * 1.02)
+
+## Risk Management
+- Always include stop losses
+- Position sizing based on account equity
+- Use strategy.risk functions for money management
+- Consider drawdown limits
+
+## Performance Optimization
+- Minimize use of security() function
+- Avoid unnecessary calculations in loops
+- Use request.security() sparingly
+- Cache repeated calculations in variables
