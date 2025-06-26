@@ -50,6 +50,3 @@ Never include any text before or after the JSON. The response must be valid JSON
     MessagesPlaceholder(variable_name="agent_scratchpad"),
 ])
 
-# Keep the old ones for compatibility
-MULTI_COLLECTION_PROMPT = SIMPLE_PROMPT
-FINAL_ANSWER_PROMPT = SIMPLE_PROMPT
